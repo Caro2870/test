@@ -7,6 +7,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { varAlpha } from 'src/theme/styles';
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
+import { ProtectedRoute, PublicRoute } from 'src/auth/guards';
 
 // ----------------------------------------------------------------------
 
@@ -16,6 +17,8 @@ export const UserPage = lazy(() => import('src/pages/user'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
+export const AuthCallback = lazy(() => import('src/pages/auth/callback'));
+export const StocksPage = lazy(() => import('src/pages/stocks'));
 
 // ----------------------------------------------------------------------
 
@@ -36,26 +39,43 @@ export function Router() {
   return useRoutes([
     {
       element: (
-        <DashboardLayout>
-          <Suspense fallback={renderFallback}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
+        <ProtectedRoute>
+          <DashboardLayout>
+            <Suspense fallback={renderFallback}>
+              <Outlet />
+            </Suspense>
+          </DashboardLayout>
+        </ProtectedRoute>
       ),
       children: [
         { element: <HomePage />, index: true },
         { path: 'user', element: <UserPage /> },
         { path: 'products', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
+        { path: 'stocks', element: <StocksPage /> },
+
       ],
     },
     {
-      path: 'sign-in',
+      path: 'auth',
       element: (
         <AuthLayout>
-          <SignInPage />
+          <Suspense fallback={renderFallback}>
+            <Outlet />
+          </Suspense>
         </AuthLayout>
       ),
+      children: [
+        { 
+          path: 'sign-in', 
+          element: (
+            <PublicRoute>
+              <SignInPage />
+            </PublicRoute>
+          ) 
+        },
+        { path: 'callback', element: <AuthCallback /> },
+      ],
     },
     {
       path: '404',
@@ -63,7 +83,7 @@ export function Router() {
     },
     {
       path: '*',
-      element: <Navigate to="/404" replace />,
+      element: <Navigate to="/auth/sign-in" replace />,
     },
   ]);
 }

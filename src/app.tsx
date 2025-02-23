@@ -10,6 +10,8 @@ import { ThemeProvider } from 'src/theme/theme-provider';
 
 import { Iconify } from 'src/components/iconify';
 
+import { WorkOSWrapper } from './config/workos';
+
 // ----------------------------------------------------------------------
 
 export default function App() {
@@ -36,9 +38,12 @@ export default function App() {
   );
 
   return (
+    <WorkOSWrapper>
     <ThemeProvider>
       <Router />
       {githubButton}
     </ThemeProvider>
+    </WorkOSWrapper>
+
   );
 }

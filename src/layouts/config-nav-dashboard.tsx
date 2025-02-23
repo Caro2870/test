@@ -35,7 +35,7 @@ export const navData = [
   },
   {
     title: 'Sign in',
-    path: '/sign-in',
+    path: '/auth/sign-in',
     icon: icon('ic-lock'),
   },
   {
@@ -43,4 +43,10 @@ export const navData = [
     path: '/404',
     icon: icon('ic-disabled'),
   },
+  {
+    title: 'Stocks',
+    path: '/stocks',
+    icon: icon('ic-analytics'),
+  },
+
 ];

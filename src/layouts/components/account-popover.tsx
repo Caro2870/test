@@ -1,6 +1,6 @@
 import type { IconButtonProps } from '@mui/material/IconButton';
-
 import { useState, useCallback } from 'react';
+import { useAuth } from '@workos-inc/authkit-react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -29,8 +29,8 @@ export type AccountPopoverProps = IconButtonProps & {
 
 export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps) {
   const router = useRouter();
-
   const pathname = usePathname();
+  const { signOut, user } = useAuth(); // Agregamos useAuth
 
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
@@ -50,6 +50,15 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
     [handleClosePopover, router]
   );
 
+  // Agregamos el manejador de logout
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
   return (
     <>
       <IconButton
@@ -64,8 +73,12 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
         }}
         {...other}
       >
-        <Avatar src={_myAccount.photoURL} alt={_myAccount.displayName} sx={{ width: 1, height: 1 }}>
-          {_myAccount.displayName.charAt(0).toUpperCase()}
+        <Avatar 
+          src={user?.profilePictureUrl || _myAccount.photoURL} 
+          alt={user?.email || _myAccount.displayName} 
+          sx={{ width: 1, height: 1 }}
+        >
+          {(user?.email || _myAccount.displayName).charAt(0).toUpperCase()}
         </Avatar>
       </IconButton>
 
@@ -83,11 +96,11 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
       >
         <Box sx={{ p: 2, pb: 1.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {_myAccount?.displayName}
+            {user?.email || _myAccount.displayName}
           </Typography>
 
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {_myAccount?.email}
+            {user?.email || _myAccount.email}
           </Typography>
         </Box>
 
@@ -129,7 +142,13 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box sx={{ p: 1 }}>
-          <Button fullWidth color="error" size="medium" variant="text">
+          <Button 
+            fullWidth 
+            color="error" 
+            size="medium" 
+            variant="text"
+            onClick={handleLogout}
+          >
             Logout
           </Button>
         </Box>
